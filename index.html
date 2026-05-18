@@ -14,18 +14,18 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-      // Suas chaves de configuração
+      // CONFIGURAÇÃO DO FIREBASE (CORRIGIDA)
       const firebaseConfig = {
         apiKey: "AIzaSyBWTZ5PIVEXgNV08LN-FQXhIQ3MV9Mzrj4",
         authDomain: "projeto-financeiro-ea099.firebaseapp.com",
         projectId: "projeto-financeiro-ea099",
         storageBucket: "projeto-financeiro-ea099.firebasestorage.app",
-        messagingSenderId: "145856793869",
-        appId: "1:145856793869:web:471f922181be8f285e3444",
+        messagingSenderId: "14585793869", // CORRIGIDO: Removido o '6' intruso
+        appId: "1:14585793869:web:471f922181be8f285e3444",
         measurementId: "G-WD6JD0VGR5"
       };
 
-      // Inicialização
+      // Inicialização dos Serviços
       firebase.initializeApp(firebaseConfig);
       const auth = firebase.auth();
       const db = firebase.firestore();
@@ -40,6 +40,12 @@
 
       const categoriasSaidas = ["Alimentação", "Moradia", "Transporte", "Lazer", "Saúde", "Outros"];
       const categoriasEntradas = ["Salário", "Investimentos", "Freelance", "Outros"];
+
+      // Executa assim que a estrutura do HTML estiver pronta
+      document.addEventListener("DOMContentLoaded", () => {
+        montarSelectCategorias(categoriasSaidas);
+        resetarDataInput();
+      });
 
       // Monitor de Autenticação
       auth.onAuthStateChanged((user) => {
@@ -98,7 +104,7 @@
         }
       }
 
-      // GRAVAÇÃO NO FIRESTORE COMMERCIAL
+      // GRAVAÇÃO NO FIRESTORE
       async function enviarDados() {
         const btn = document.getElementById('btn');
         const dataInput = document.getElementById('data').value;
@@ -142,7 +148,7 @@
         }
       }
 
-      // CARREGAR DO FIRESTORE COMMERCIAL
+      // CARREGAR DO FIRESTORE
       async function carregarDadosUsuario() {
         resetarDataInput();
         const anoAtual = new Date().getFullYear().toString();
@@ -160,7 +166,6 @@
             }
           });
 
-          // Ordenação manual local da data para evitar criar índices complexos agora
           todosOsDados.sort((a, b) => b.data.localeCompare(a.data));
 
           atualizarSaldosEMetricas();
@@ -199,11 +204,15 @@
         const yyyy = hoje.getFullYear();
         const mm = String(hoje.getMonth() + 1).padStart(2, '0');
         const dd = String(hoje.getDate()).padStart(2, '0');
-        document.getElementById('data').value = `${yyyy}-${mm}-${dd}`;
+        const campoData = document.getElementById('data');
+        if (campoData) campoData.value = `${yyyy}-${mm}-${dd}`;
       }
 
       function montarSelectCategorias(lista) {
-        document.getElementById('categoria').innerHTML = lista.map(c => `<option value="${c}">${c}</option>`).join('');
+        const campoCategoria = document.getElementById('categoria');
+        if (campoCategoria) {
+          campoCategoria.innerHTML = lista.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
       }
 
       function aplicarFiltroETabela() {
@@ -231,7 +240,7 @@
         }
 
         corpo.innerHTML = dadosPagina.map(linha => {
-          const partesData = linha.data.split('-');
+          const partesData = Serverlinha = linha.data.split('-');
           return `
             <tr class="border-b border-slate-50 hover:bg-slate-50/80 transition">
               <td class="py-4 px-2 text-[10px] text-slate-400 font-extrabold">${partesData[2]}/${partesData[1]}/${partesData[0]}</td>
@@ -291,7 +300,9 @@
       }
 
       function renderizarGraficoMensal() {
-        const ctx = document.getElementById('graficoMensal').getContext('2d');
+        const canvas = document.getElementById('graficoMensal');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
         if (meuGrafico) meuGrafico.destroy();
 
         const mesesNomes = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
